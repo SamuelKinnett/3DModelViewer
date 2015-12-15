@@ -1,19 +1,8 @@
-﻿Build started 15/12/2015 15:30:42.
+﻿Build started 15/12/2015 17:36:17.
      1>Project "C:\Users\Samuel\Documents\GitHub\3DModelViewer\3DModelViewer\3DModelViewer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt Matrix4x4.cpp OBJFileReader.cpp OGLApplication.cpp OGLCube.cpp OGLWindow.cpp Triangle.cpp TriangleMesh.cpp
-         TriangleMesh.cpp
-         Triangle.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt OGLWindow.cpp
          OGLWindow.cpp
-         OGLCube.cpp
-     1>OGLCube.cpp(76): warning C4244: 'argument' : conversion from 'unsigned int' to 'GLfloat', possible loss of data
-         OBJFileReader.cpp
-         Matrix4x4.cpp
-     1>Matrix4x4.cpp(8): warning C4305: '=' : truncation from 'double' to 'float'
-     1>Matrix4x4.cpp(15): warning C4305: '=' : truncation from 'double' to 'float'
-         Generating Code...
-         Skipping... (no relevant changes detected)
-         OGLApplication.cpp
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.lib" /MACHINE:X64 x64\Debug\OGLWin32.res
          x64\Debug\Matrix4x4.obj
@@ -27,9 +16,9 @@
          x64\Debug\TriangleMesh.obj
          x64\Debug\Vector2D.obj
          x64\Debug\Vector4D.obj
-     1>LINK : fatal error LNK1168: cannot open C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.exe for writing
-     1>Done Building Project "C:\Users\Samuel\Documents\GitHub\3DModelViewer\3DModelViewer\3DModelViewer.vcxproj" (Build target(s)) -- FAILED.
+         3DModelViewer.vcxproj -> C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.exe
+     1>Done Building Project "C:\Users\Samuel\Documents\GitHub\3DModelViewer\3DModelViewer\3DModelViewer.vcxproj" (Build target(s)).
 
-Build FAILED.
+Build succeeded.
 
-Time Elapsed 00:00:05.31
+Time Elapsed 00:00:02.14

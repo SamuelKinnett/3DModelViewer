@@ -75,9 +75,9 @@ Vector4D Matrix4x4::operator* (const Vector4D& rhs) const
 	for (int currentRow = 0; currentRow < 4; ++currentRow) {
 		temporaryVector[currentRow] =
 			m_element[0][currentRow] * rhs[0] +
-			m_element[0][currentRow] * rhs[1] +
-			m_element[0][currentRow] * rhs[2] +
-			m_element[0][currentRow] * rhs[3];
+			m_element[1][currentRow] * rhs[1] +
+			m_element[2][currentRow] * rhs[2] +
+			m_element[3][currentRow] * rhs[3];
 	}
 	
 	result.SetVector(temporaryVector[0], temporaryVector[1],

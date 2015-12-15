@@ -168,19 +168,14 @@ void OGLWindow::Resize( int width, int height )
 	double aspectratio = (double)m_width / (double)m_height;
 
 	glViewport(left >> 1, top >>1 , m_width, m_height );
-	
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	glOrtho(aspectratio*-2.0, aspectratio*2.0, -2.0, 2.0, -5.0, 5.0);
 	
 	//TODO:
 	// Change from orthographic project to perspective projection
 	// use either glFrustum or gluPerspective
-
-	//I'll use glfrustrum until I can get the camera function 
-	//in the matrix class working
-
-
+	
+	glFrustum(aspectratio * -2.0, aspectratio * 2.0, -2.0, 2.0, 0, 5.0);
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 

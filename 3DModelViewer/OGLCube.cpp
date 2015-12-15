@@ -72,10 +72,28 @@ void OGLCube::Render(const Matrix4x4* trans)
 	// so that the rendered cube is transformed by the matrix
 
 	for (int currentTriangle = 0; currentTriangle < 36; currentTriangle += 3) {
-		glBegin(GL_TRIANGLES);
-		glVertex3f(m_vertices[m_indices[currentTriangle]].position[0], 
-			m_vertices[m_indices[currentTriangle]].position[1], 
+		
+		Vector4D point1(m_vertices[m_indices[currentTriangle]].position[0],
+			m_vertices[m_indices[currentTriangle]].position[1],
 			m_vertices[m_indices[currentTriangle]].position[2]);
+
+		Vector4D point2(m_vertices[m_indices[currentTriangle + 1]].position[0],
+			m_vertices[m_indices[currentTriangle + 1]].position[1],
+			m_vertices[m_indices[currentTriangle + 1]].position[2]);
+
+		Vector4D point3(m_vertices[m_indices[currentTriangle + 2]].position[0],
+			m_vertices[m_indices[currentTriangle + 2]].position[1],
+			m_vertices[m_indices[currentTriangle + 2]].position[2]);
+
+		point1 = *trans * point1;
+		point2 = *trans * point2;
+		point3 = *trans * point3;
+
+		glColor3ub(255, 255, 255);
+		glBegin(GL_LINE_LOOP);
+		glVertex3f(point1[0], point1[1], point1[2]);
+		glVertex3f(point2[0], point2[1], point2[2]);
+		glVertex3f(point3[0], point3[1], point3[2]);
 		glEnd();
 	}
 
