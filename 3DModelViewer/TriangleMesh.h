@@ -6,6 +6,7 @@
 #include "Triangle.h"
 #include "Vector4D.h"
 #include <vector>
+#include "Matrix4x4.h"
 
 //A minimalistic Vertex structure
 struct Vertex

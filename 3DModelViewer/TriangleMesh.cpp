@@ -3,6 +3,8 @@
 
 #include "TriangleMesh.h"
 #include "OBJFileReader.h"
+#include <Windows.h>
+#include "gl/GL.h"
 
 TriangleMesh::TriangleMesh()
 {
@@ -24,6 +26,75 @@ void TriangleMesh::Render(const Matrix4x4* trans)
 	//1. Render the TriangleMesh using the vertices and triangle data stored in m_vertices and m_triangle
 	//2. Transform the triangle mesh using the given transformation trans
 	
+
+	for (int currentTriangle = 0; currentTriangle < m_numTriangles; ++currentTriangle) {
+
+		int* vertexIndices;	//The indexes of the vertices making up the triangle
+		vertexIndices = (int *)m_triangles[currentTriangle].GetVertexIndices();
+
+		Vector4D point1(m_vertices[vertexIndices[0]].m_position[0], 
+			m_vertices[vertexIndices[0]].m_position[1],
+			m_vertices[vertexIndices[0]].m_position[2]);
+
+		Vector4D point2(m_vertices[vertexIndices[1]].m_position[0],
+			m_vertices[vertexIndices[1]].m_position[1],
+			m_vertices[vertexIndices[1]].m_position[2]);
+
+		Vector4D point3(m_vertices[vertexIndices[2]].m_position[0],
+			m_vertices[vertexIndices[2]].m_position[1],
+			m_vertices[vertexIndices[2]].m_position[2]);
+
+		point1 = *trans * point1;
+		point2 = *trans * point2;
+		point3 = *trans * point3;
+
+		glColor3ub(255, 0 + (currentTriangle * 2), 0 + (currentTriangle * 2));
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		glBegin(GL_TRIANGLES);
+		glVertex3f(point1[0], point1[1], point1[2]);
+		glVertex3f(point2[0], point2[1], point2[2]);
+		glVertex3f(point3[0], point3[1], point3[2]);
+		glEnd();
+
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+
+	/*
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glBegin(GL_TRIANGLE_STRIP);
+	for (int currentTriangle = 0; currentTriangle < m_numTriangles; ++currentTriangle) {
+
+		int* vertexIndices;	//The indexes of the vertices making up the triangle
+		vertexIndices = (int *)m_triangles[currentTriangle].GetVertexIndices();
+
+		Vector4D point1(m_vertices[vertexIndices[0]].m_position[0],
+			m_vertices[vertexIndices[0]].m_position[1],
+			m_vertices[vertexIndices[0]].m_position[2]);
+
+		Vector4D point2(m_vertices[vertexIndices[1]].m_position[0],
+			m_vertices[vertexIndices[1]].m_position[1],
+			m_vertices[vertexIndices[1]].m_position[2]);
+
+		Vector4D point3(m_vertices[vertexIndices[0]].m_position[0],
+			m_vertices[vertexIndices[2]].m_position[1],
+			m_vertices[vertexIndices[2]].m_position[2]);
+
+		point1 = *trans * point1;
+		point2 = *trans * point2;
+		point3 = *trans * point3;
+
+		glColor3ub(255, 0 + (currentTriangle * 20), 0 + (currentTriangle * 20));
+
+		glVertex3f(point1[0], point1[1], point1[2]);
+		glVertex3f(point2[0], point2[1], point2[2]);
+		glVertex3f(point3[0], point3[1], point3[2]);
+	}
+	glEnd();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	*/
+
 	//TODO: Advanced Feature
 	//Use the OpenGL fixed pipeline to render a lit mesh
 	//Note: for per-face lighting you need to compute the normal for each triangle see ComputeTriangleNormals

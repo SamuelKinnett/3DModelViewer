@@ -5,6 +5,7 @@
 #include "OGLWindow.h"
 #include "Matrix4x4.h"
 #include "Vector4D.h"
+#include <cmath>
 
 OGLWindow::OGLWindow()
 {
@@ -122,6 +123,9 @@ BOOL OGLWindow::InitWindow(HINSTANCE hInstance, int width, int height)
 
 	//Instantiate a Renderable as OGLCube
 	m_cube = new OGLCube();
+	m_model = new TriangleMesh();
+	//m_model->LoadMeshFromOBJFile("Models/cube.obj");
+	m_model->LoadMeshFromOBJFile("Models/teapot.obj");
 	return TRUE;
 }
 
@@ -132,20 +136,32 @@ void OGLWindow::SetVisible ( BOOL visible )
 
 void OGLWindow::Render()
 {
+	++time;
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glLoadIdentity();
 	
 	Matrix4x4 transformation;
+	Matrix4x4 temporaryTransformation;	//Stores a transformation before it is concatenated
+										//with the main transformation.
 	//TODO:
 	//1. Set the matrix 'transformation' as a rotation about the Z axis
 	//
 	//2. Set the matrix 'transformation' as a more complex transformation by concatenating, e.g. Rz Rx Ry
 
 	//Set the transformation matrix as a 30 degree rotation about the z axis
-	transformation.SetRotationZAxis(30);
+	
+	transformation.SetIdentity();
+	//temporaryTransformation.SetRotationYAxis(time / 30);
+	//transformation = transformation * temporaryTransformation;
+	temporaryTransformation.SetTranslate(*new Vector4D(0, 0, -90));
+	transformation = transformation * temporaryTransformation;
+	temporaryTransformation.SetScale(0.00001, 0.00001, 0.00001);
+	transformation = transformation * temporaryTransformation;
 
-	m_cube->Render(&transformation);
+	//m_cube->Render(&transformation);
+	m_model->Render(&transformation);
 
 	glFlush();
 
@@ -174,8 +190,9 @@ void OGLWindow::Resize( int width, int height )
 	//TODO:
 	// Change from orthographic project to perspective projection
 	// use either glFrustum or gluPerspective
-	
-	glFrustum(aspectratio * -2.0, aspectratio * 2.0, -2.0, 2.0, 0, 5.0);
+
+	//glFrustum(aspectratio * -2.0, aspectratio * 2.0, -2.0, 2.0, 0, 100);
+	gluPerspective(110, aspectratio, 0, 100);
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 

@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include "OGLRectangle.h"
 #include "OGLCube.h"
+#include "TriangleMesh.h"
+#include "OBJFileReader.h"
 
 class OGLWindow
 {
@@ -16,6 +18,10 @@ class OGLWindow
 		
 		//This is not an ideal place to hold geometry data
 		OGLCube			*m_cube;
+		TriangleMesh	*m_model;
+
+		//TESTING
+		float time;
 
 protected:
 
