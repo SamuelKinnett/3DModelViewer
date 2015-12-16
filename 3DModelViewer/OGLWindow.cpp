@@ -121,11 +121,14 @@ BOOL OGLWindow::InitWindow(HINSTANCE hInstance, int width, int height)
 	if (!(m_hglrc = CreateOGLContext(m_hdc)))
 		return FALSE;
 
+	//Initialise the OpenGL variables
+	InitOGLState();
+
 	//Instantiate a Renderable as OGLCube
 	m_cube = new OGLCube();
 	m_model = new TriangleMesh();
-	//m_model->LoadMeshFromOBJFile("Models/cube.obj");
-	m_model->LoadMeshFromOBJFile("Models/teapot.obj");
+	m_model->LoadMeshFromOBJFile("Models/cube.obj");
+	//m_model->LoadMeshFromOBJFile("Models/teapot.obj");
 	return TRUE;
 }
 
@@ -152,12 +155,14 @@ void OGLWindow::Render()
 
 	//Set the transformation matrix as a 30 degree rotation about the z axis
 	
-	transformation.SetIdentity();
-	//temporaryTransformation.SetRotationYAxis(time / 30);
-	//transformation = transformation * temporaryTransformation;
-	temporaryTransformation.SetTranslate(*new Vector4D(0, 0, -90));
+	//Remember, T.R.S.
+
+	temporaryTransformation.SetScale(0.0000000000001, 0.0000000000001, 0.0000000000001);
 	transformation = transformation * temporaryTransformation;
-	temporaryTransformation.SetScale(0.00001, 0.00001, 0.00001);
+
+	transformation.SetIdentity();
+
+	temporaryTransformation.SetTranslate(*new Vector4D(0, 0, 20));
 	transformation = transformation * temporaryTransformation;
 
 	//m_cube->Render(&transformation);
@@ -191,8 +196,8 @@ void OGLWindow::Resize( int width, int height )
 	// Change from orthographic project to perspective projection
 	// use either glFrustum or gluPerspective
 
-	//glFrustum(aspectratio * -2.0, aspectratio * 2.0, -2.0, 2.0, 0, 100);
-	gluPerspective(110, aspectratio, 0, 100);
+	//glFrustum(aspectratio * -2.0, aspectratio * 2.0, -2.0, 2.0, 1.0f, 100);
+	gluPerspective(90, aspectratio, 0.0f, 100.0f);
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
@@ -202,9 +207,36 @@ void OGLWindow::Resize( int width, int height )
 void OGLWindow::InitOGLState()
 {
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+	//glClearDepth(0.0f);
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthMask(GL_TRUE);
+	//glDepthFunc(GL_LEQUAL);
+
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
+
+	//Enable lighting
+	float diffuseLight[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	float specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	float ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	float lightPosition[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_COLOR_MATERIAL);
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+	glColorMaterial(GL_FRONT, GL_DIFFUSE);
+	glColorMaterial(GL_FRONT, GL_SPECULAR);
+	glShadeModel(GL_SMOOTH);
+
 }
 
 BOOL OGLWindow::MouseLBDown ( int x, int y )

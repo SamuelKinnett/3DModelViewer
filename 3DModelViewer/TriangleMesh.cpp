@@ -44,20 +44,37 @@ void TriangleMesh::Render(const Matrix4x4* trans)
 			m_vertices[vertexIndices[2]].m_position[1],
 			m_vertices[vertexIndices[2]].m_position[2]);
 
+		//Normalise the points
+
+		//point1.Normalise();
+		//point2.Normalise();
+		//point3.Normalise();
+
 		point1 = *trans * point1;
 		point2 = *trans * point2;
 		point3 = *trans * point3;
 
-		glColor3ub(255, 0 + (currentTriangle * 2), 0 + (currentTriangle * 2));
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		Vector4D side1 = point2 - point1;
+		Vector4D side2 = point3 - point1;
+		
+		Vector4D normal = side1.CrossProduct(side2);
+		normal.Normalise();
 
-		glBegin(GL_TRIANGLES);
-		glVertex3f(point1[0], point1[1], point1[2]);
-		glVertex3f(point2[0], point2[1], point2[2]);
-		glVertex3f(point3[0], point3[1], point3[2]);
-		glEnd();
+		//Backface culling
+		if (normal.DotProduct(point1) < 0) {
+			glNormal3f(normal[0], normal[1], normal[2]);
 
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glColor3f(0.5f, 0.2f, 0.2f);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+			glBegin(GL_TRIANGLES);
+			glVertex3f(point1[0], point1[1], point1[2]);
+			glVertex3f(point2[0], point2[1], point2[2]);
+			glVertex3f(point3[0], point3[1], point3[2]);
+			glEnd();
+
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
 	}
 
 
