@@ -54,10 +54,10 @@ Matrix4x4 Matrix4x4::operator* (const Matrix4x4& rhs) const
 			//The x and y integers are used to determine the
 			//row for this matrix and the column for the rhs.
 			result.m_element[x][y] =
-				m_element[0][x] * rhs.m_element[y][0] +
-				m_element[1][x] * rhs.m_element[y][1] +
-				m_element[2][x] * rhs.m_element[y][2] +
-				m_element[3][x] * rhs.m_element[y][3];
+				m_element[0][y] * rhs.m_element[x][0] +
+				m_element[1][y] * rhs.m_element[x][1] +
+				m_element[2][y] * rhs.m_element[x][2] +
+				m_element[3][y] * rhs.m_element[x][3];
 		}
 	}
 	
@@ -162,6 +162,65 @@ void Matrix4x4::SetViewMatrix(const Vector4D& camera_position, const Vector4D& v
 {
 	//TODO: Slightly more advanced
 	//Set this matrix as a view matrix based on the given camera_position, view_vector and up_vector
+
+	//View matrix looks like this
+	//	Rx		Ry		Rz		EyeX
+	//	Ux		Uy		Uz		EyeY
+	//	Vx		Vy		Vz		EyeZ
+	//	0		0		0		1
+
+	Vector4D right_vector = view_vector.CrossProduct(up_vector);
+	right_vector.Normalise();
+
+	SetIdentity();
+
+	m_element[0][0] = right_vector[0]; 
+	m_element[1][0] = right_vector[1];
+	m_element[2][0] = right_vector[2];
+	m_element[3][0] = camera_position[0];
+
+	m_element[0][1] = up_vector[0];
+	m_element[1][1] = up_vector[1];
+	m_element[2][1] = up_vector[2];
+	m_element[3][1] = camera_position[1];
+
+	m_element[0][2] = view_vector[0];
+	m_element[1][2] = view_vector[1];
+	m_element[2][2] = view_vector[2];
+	m_element[3][2] = camera_position[2];
+
+}
+
+//Fuck that awful method, use this one instead!
+void Matrix4x4::SetLookAt(Vector4D eyePosition, Vector4D target, Vector4D up) {
+	
+	SetIdentity();
+
+	Vector4D forwardVector = eyePosition - target;
+	forwardVector.Normalise();
+	Vector4D rightVector = forwardVector.CrossProduct(up);
+	rightVector.Normalise();
+	Vector4D upVector = rightVector.CrossProduct(forwardVector);
+	upVector.Normalise();
+
+	//Set the matrix
+	m_element[0][0] = rightVector[0];
+	m_element[1][0] = rightVector[1];
+	m_element[2][0] = rightVector[2];
+
+	m_element[0][1] = upVector[0];
+	m_element[1][1] = upVector[1];
+	m_element[2][1] = upVector[2];
+
+	m_element[0][2] = forwardVector[0];
+	m_element[1][2] = forwardVector[1];
+	m_element[2][2] = forwardVector[2];
+
+	//Set the position of the camera, accounting for the fact that it must be inverted
+
+	m_element[3][0] = rightVector.DotProduct(eyePosition) * -1;
+	m_element[3][1] = upVector.DotProduct(eyePosition) * -1;
+	m_element[3][2] = forwardVector.DotProduct(eyePosition) * -1;
 
 
 }

@@ -121,6 +121,9 @@ BOOL OGLWindow::InitWindow(HINSTANCE hInstance, int width, int height)
 	if (!(m_hglrc = CreateOGLContext(m_hdc)))
 		return FALSE;
 
+	//Initialise the OpenGL variables
+	InitOGLState();
+
 	//Instantiate a Renderable as OGLCube
 	m_cube = new OGLCube();
 	m_model = new TriangleMesh();
@@ -138,13 +141,22 @@ void OGLWindow::Render()
 {
 	++time;
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
 	
 	Matrix4x4 transformation;
 	Matrix4x4 temporaryTransformation;	//Stores a transformation before it is concatenated
 										//with the main transformation.
+	
+	//Camera variables
+	Vector4D cameraPosition(0, 0, -10);
+	m_model->UpdateCameraPosition(&cameraPosition);
+	Vector4D upVector(0, 1, 0);
+	Vector4D lookAt(0, 0, 0);
+	Vector4D viewVector = lookAt - cameraPosition;
+	viewVector.Normalise();
+
 	//TODO:
 	//1. Set the matrix 'transformation' as a rotation about the Z axis
 	//
@@ -152,12 +164,23 @@ void OGLWindow::Render()
 
 	//Set the transformation matrix as a 30 degree rotation about the z axis
 	
+	//Remember, M.T.R.S.
+
 	transformation.SetIdentity();
-	//temporaryTransformation.SetRotationYAxis(time / 30);
-	//transformation = transformation * temporaryTransformation;
-	temporaryTransformation.SetTranslate(*new Vector4D(0, 0, -90));
+	Vector4D translationVector(0, 0, sin(time * 0.0174533));
+
+	temporaryTransformation.SetViewMatrix(cameraPosition, viewVector, upVector);
 	transformation = transformation * temporaryTransformation;
-	temporaryTransformation.SetScale(0.00001, 0.00001, 0.00001);
+
+	temporaryTransformation.SetTranslate(translationVector);
+	transformation = transformation * temporaryTransformation;
+
+	temporaryTransformation.SetRotationYAxis(time / 30);
+	transformation = transformation * temporaryTransformation;
+	temporaryTransformation.SetRotationZAxis(time / 60);
+	transformation = transformation * temporaryTransformation;
+
+	temporaryTransformation.SetScale(0.05, 0.05, 0.05);
 	transformation = transformation * temporaryTransformation;
 
 	//m_cube->Render(&transformation);
@@ -191,8 +214,8 @@ void OGLWindow::Resize( int width, int height )
 	// Change from orthographic project to perspective projection
 	// use either glFrustum or gluPerspective
 
-	//glFrustum(aspectratio * -2.0, aspectratio * 2.0, -2.0, 2.0, 0, 100);
-	gluPerspective(110, aspectratio, 0, 100);
+	//glFrustum(aspectratio * -2.0, aspectratio * 2.0, -2.0, 2.0, 1.0f, 100);
+	gluPerspective(90, aspectratio, 1.0f, 100.0f);
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
@@ -202,9 +225,36 @@ void OGLWindow::Resize( int width, int height )
 void OGLWindow::InitOGLState()
 {
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+	//glClearDepth(0.0f);
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LEQUAL);
+
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
+
+	//Enable lighting
+	float diffuseLight[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	float specularLight[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	float ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	float lightPosition[] = { -5.0f, 2.0f, 0.0f, 1.0f };
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_COLOR_MATERIAL);
+
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
+	glColorMaterial(GL_FRONT, GL_DIFFUSE);
+	glColorMaterial(GL_FRONT, GL_SPECULAR);
+	glShadeModel(GL_FLAT);
+
 }
 
 BOOL OGLWindow::MouseLBDown ( int x, int y )
