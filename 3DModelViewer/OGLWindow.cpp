@@ -124,11 +124,18 @@ BOOL OGLWindow::InitWindow(HINSTANCE hInstance, int width, int height)
 	//Initialise the OpenGL variables
 	InitOGLState();
 
-	//Instantiate a Renderable as OGLCube
-	m_cube = new OGLCube();
-	m_model = new TriangleMesh();
+	//Load the teapot model
+	models.push_back(new TriangleMesh());
+	models[0]->LoadMeshFromOBJFile("Models/teapot.obj");
+
 	//m_model->LoadMeshFromOBJFile("Models/cube.obj");
-	m_model->LoadMeshFromOBJFile("Models/teapot.obj");
+
+	//Add a funky transformation
+	transformations.push_back(new Matrix4x4());
+
+	//Add a teapot with the funky transformation to the world
+	sceneModels.push_back(new ModelInstance(models[0], transformations[0]));
+
 	return TRUE;
 }
 
@@ -149,13 +156,23 @@ void OGLWindow::Render()
 	Matrix4x4 temporaryTransformation;	//Stores a transformation before it is concatenated
 										//with the main transformation.
 	
-	//Camera variables
-	Vector4D cameraPosition(0, 0, -10);
-	m_model->UpdateCameraPosition(&cameraPosition);
-	Vector4D upVector(0, 1, 0);
-	Vector4D lookAt(0, 0, 0);
-	Vector4D viewVector = lookAt - cameraPosition;
-	viewVector.Normalise();
+	//Update camera variables
+	m_camera.cameraPosition.SetVector(0, 0, -10, 1);
+	m_camera.upVector.SetVector(0, 1, 0, 1);
+	m_camera.lookAt.SetVector(0, 0, 0, 1);
+	Vector4D tempViewVector = m_camera.lookAt - m_camera.cameraPosition;
+	m_camera.viewVector.SetVector(tempViewVector[0], tempViewVector[1], tempViewVector[2], tempViewVector[3]);
+	m_camera.viewVector.Normalise();
+
+	//Update the transformation matrices
+	UpdateTransformationMatrices();
+
+	//Update the camera position stored in each model
+	for (int currentModel = 0; currentModel < sceneModels.size(); ++currentModel) {
+		sceneModels[currentModel]->model->UpdateCameraPosition(&m_camera.cameraPosition);
+		sceneModels[currentModel]->model->Render(
+			sceneModels[currentModel]->transformation);
+	}
 
 	//TODO:
 	//1. Set the matrix 'transformation' as a rotation about the Z axis
@@ -165,26 +182,6 @@ void OGLWindow::Render()
 	//Set the transformation matrix as a 30 degree rotation about the z axis
 	
 	//Remember, M.T.R.S.
-
-	transformation.SetIdentity();
-	Vector4D translationVector(0, 0, sin(time * 0.0174533));
-
-	temporaryTransformation.SetViewMatrix(cameraPosition, viewVector, upVector);
-	transformation = transformation * temporaryTransformation;
-
-	temporaryTransformation.SetTranslate(translationVector);
-	transformation = transformation * temporaryTransformation;
-
-	temporaryTransformation.SetRotationYAxis(time / 30);
-	transformation = transformation * temporaryTransformation;
-	temporaryTransformation.SetRotationZAxis(time / 60);
-	transformation = transformation * temporaryTransformation;
-
-	temporaryTransformation.SetScale(0.05, 0.05, 0.05);
-	transformation = transformation * temporaryTransformation;
-
-	//m_cube->Render(&transformation);
-	m_model->Render(&transformation);
 
 	glFlush();
 
@@ -271,4 +268,32 @@ BOOL OGLWindow::MouseLBUp ( int x, int y )
 BOOL OGLWindow::MouseMove ( int x, int y )
 {
 	return TRUE;
+}
+
+//Add code here for updating transformation matrices
+void OGLWindow::UpdateTransformationMatrices() {
+	
+	//Translation 0, an animation.
+	Vector4D translationVector(0, 0, sin(time * 0.0174533));
+	Matrix4x4 temporaryTransformation;
+
+	transformations[0]->SetIdentity();
+	temporaryTransformation.SetIdentity();
+
+	//Apply the view matrix first of all
+	temporaryTransformation.SetViewMatrix(m_camera.cameraPosition, 
+											m_camera.viewVector, 
+											m_camera.upVector);
+	*transformations[0] = *transformations[0] * temporaryTransformation;
+
+	temporaryTransformation.SetTranslate(translationVector);
+	*transformations[0] = *transformations[0] * temporaryTransformation;
+
+	temporaryTransformation.SetRotationYAxis(time / 30);
+	*transformations[0] = *transformations[0] * temporaryTransformation;
+	temporaryTransformation.SetRotationZAxis(time / 60);
+	*transformations[0] = *transformations[0] * temporaryTransformation;
+
+	temporaryTransformation.SetScale(0.05, 0.05, 0.05);
+	*transformations[0] = *transformations[0] * temporaryTransformation;
 }
