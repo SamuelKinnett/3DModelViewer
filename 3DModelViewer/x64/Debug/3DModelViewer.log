@@ -1,9 +1,10 @@
-﻿Build started 16/12/2015 23:29:07.
+﻿Build started 17/12/2015 15:36:52.
      1>Project "C:\Users\Samuel\Documents\GitHub\3DModelViewer\3DModelViewer\3DModelViewer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt OGLWindow.cpp
          OGLWindow.cpp
-     1>OGLWindow.cpp(160): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>OGLWindow.cpp(170): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>OGLWindow.cpp(183): warning C4305: 'argument' : truncation from 'double' to 'float'
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Samuel\Documents\GitHub\3DModelViewer\x64\Debug\3DModelViewer.lib" /MACHINE:X64 x64\Debug\OGLWin32.res
          x64\Debug\Matrix4x4.obj
@@ -22,4 +23,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.65
+Time Elapsed 00:00:01.40

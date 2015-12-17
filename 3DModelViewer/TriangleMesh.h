@@ -22,6 +22,7 @@ class TriangleMesh : public Renderable
 		Triangle*		m_triangles;		//a list of triangles
 		int				m_numVertices;		//the number of vertices in the mesh
 		int				m_numTriangles;		//the number of triangles in the mesh
+		Vector4D		cameraPosition;
 		
 		//TODO: Advanced Features for lighting
 		//Calculate the normal for each triangle
@@ -34,6 +35,7 @@ class TriangleMesh : public Renderable
 		~TriangleMesh();
 
 		void Render(const Matrix4x4* trans = 0);
+		void UpdateCameraPosition(Vector4D* cameraPosition);
 
 		bool LoadMeshFromOBJFile(const char* filename);
 

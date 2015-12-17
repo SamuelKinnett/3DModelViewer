@@ -56,12 +56,15 @@ void TriangleMesh::Render(const Matrix4x4* trans)
 
 		Vector4D side1 = point2 - point1;
 		Vector4D side2 = point3 - point1;
+
+		Vector4D lineToCamera = point1 - cameraPosition;
+		lineToCamera.Normalise();
 		
 		Vector4D normal = side1.CrossProduct(side2);
 		normal.Normalise();
 
 		//Backface culling
-		if (normal.DotProduct(point1) < 0) {
+		//if (normal.DotProduct(point1) < 0) {
 			glNormal3f(normal[0], normal[1], normal[2]);
 
 			glColor3f(0.5f, 0.2f, 0.2f);
@@ -74,7 +77,7 @@ void TriangleMesh::Render(const Matrix4x4* trans)
 			glEnd();
 
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
+		//}
 	}
 
 
@@ -180,4 +183,8 @@ void TriangleMesh::CleanUp()
 	m_triangles = NULL;
 	m_numTriangles = 0;
 	m_numVertices = 0;
+}
+
+void TriangleMesh::UpdateCameraPosition(Vector4D* cameraPosition) {
+	this->cameraPosition = *cameraPosition;
 }
