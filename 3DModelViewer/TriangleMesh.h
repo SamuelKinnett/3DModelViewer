@@ -22,7 +22,9 @@ class TriangleMesh : public Renderable
 		Triangle*		m_triangles;		//a list of triangles
 		int				m_numVertices;		//the number of vertices in the mesh
 		int				m_numTriangles;		//the number of triangles in the mesh
-		Vector4D		cameraPosition;
+
+		Vector4D		cameraPosition;		//The position of the camera, used for backface culling.
+
 		
 		//TODO: Advanced Features for lighting
 		//Calculate the normal for each triangle
