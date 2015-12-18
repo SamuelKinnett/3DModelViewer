@@ -63,7 +63,7 @@ void TriangleMesh::Render(const Matrix4x4* trans)
 		Vector4D normal = side1.CrossProduct(side2);
 		normal.Normalise();
 
-		//Backface culling
+		//Backface culling currently commented out
 		//if (normal.DotProduct(point1) < 0) {
 			glNormal3f(normal[0], normal[1], normal[2]);
 
@@ -80,10 +80,17 @@ void TriangleMesh::Render(const Matrix4x4* trans)
 		//}
 	}
 
+	//TODO: Advanced Feature
+	//Use the OpenGL fixed pipeline to render a lit mesh
+	//Note: for per-face lighting you need to compute the normal for each triangle see ComputeTriangleNormals
+	// for per-vertex lighting you need to compute the normal for each vertex see ComputeVertexNormals
+}
 
-	/*
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glBegin(GL_TRIANGLE_STRIP);
+void TriangleMesh::ComputeTriangleNormals()
+{
+	//TODO: Advanced feature
+	//Compute the normal for each triangle stored in m_triangles
+
 	for (int currentTriangle = 0; currentTriangle < m_numTriangles; ++currentTriangle) {
 
 		int* vertexIndices;	//The indexes of the vertices making up the triangle
@@ -97,34 +104,18 @@ void TriangleMesh::Render(const Matrix4x4* trans)
 			m_vertices[vertexIndices[1]].m_position[1],
 			m_vertices[vertexIndices[1]].m_position[2]);
 
-		Vector4D point3(m_vertices[vertexIndices[0]].m_position[0],
+		Vector4D point3(m_vertices[vertexIndices[2]].m_position[0],
 			m_vertices[vertexIndices[2]].m_position[1],
 			m_vertices[vertexIndices[2]].m_position[2]);
 
-		point1 = *trans * point1;
-		point2 = *trans * point2;
-		point3 = *trans * point3;
+		Vector4D side1 = point2 - point1;
+		Vector4D side2 = point3 - point1;
 
-		glColor3ub(255, 0 + (currentTriangle * 20), 0 + (currentTriangle * 20));
+		Vector4D normal = side1.CrossProduct(side2);
+		normal.Normalise();
 
-		glVertex3f(point1[0], point1[1], point1[2]);
-		glVertex3f(point2[0], point2[1], point2[2]);
-		glVertex3f(point3[0], point3[1], point3[2]);
+		m_triangles[currentTriangle].SetNormal(normal);
 	}
-	glEnd();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	*/
-
-	//TODO: Advanced Feature
-	//Use the OpenGL fixed pipeline to render a lit mesh
-	//Note: for per-face lighting you need to compute the normal for each triangle see ComputeTriangleNormals
-	// for per-vertex lighting you need to compute the normal for each vertex see ComputeVertexNormals
-}
-
-void TriangleMesh::ComputeTriangleNormals()
-{
-	//TODO: Advanced feature
-	//Compute the normal for each triangle stored in m_triangles
 }
 
 void TriangleMesh::ComputeVertexNormals()

@@ -6,28 +6,7 @@
 #include "OGLCube.h"
 #include "TriangleMesh.h"
 #include "OBJFileReader.h"
-
-//Simple camera structure
-struct Camera
-{
-	Vector4D cameraPosition;
-	Vector4D upVector;
-	Vector4D lookAt;
-	Vector4D viewVector;
-};
-
-//Stores a model and a transformation to apply to it.
-//Allows for more efficient memory usage by rendering, for example,
-// the same teapot model at three different locations.
-struct ModelInstance
-{
-	ModelInstance(TriangleMesh* model, Matrix4x4* transformation) {
-		this->model = model;
-		this->transformation = transformation;
-	}
-	TriangleMesh*	model;
-	Matrix4x4*		transformation;
-};
+#include "Model.h"
 
 class OGLWindow
 {
@@ -44,9 +23,8 @@ class OGLWindow
 		Camera			m_camera;
 
 		std::vector<TriangleMesh*>	models;	//Stores a list of models
-		std::vector<Matrix4x4*>		transformations;	//Stores a list of transformations.
 
-		std::vector<ModelInstance*> sceneModels;	//All models to be rendered.
+		std::vector<Model*> sceneModels;	//All models to be rendered.
 
 		//TESTING
 		float time;
@@ -54,6 +32,22 @@ class OGLWindow
 		void UpdateTransformationMatrices();	//The user can add code here to update their stored
 												// transformation matrices. This can be used to allow
 												// animations.
+		void LoadModels();	//Loads every .obj file into the models list.
+
+		//The following variables are used with keyboard input for the manipulation of models.
+		
+		bool keyDown;
+		WPARAM lastKey;
+
+		int totalModels;
+		int focusedModel;
+
+		float rotateX;
+		float rotateY;
+		float rotateZ;
+		float zoom;
+
+
 protected:
 
 		HGLRC CreateOGLContext (HDC hdc);
@@ -74,4 +68,6 @@ protected:
 		BOOL		MouseLBDown ( int x, int y );
 		BOOL		MouseLBUp ( int x, int y );
 		BOOL		MouseMove ( int x, int y );
+		BOOL		KeyDown(WPARAM key);
+		BOOL		KeyUp(WPARAM key);
 };

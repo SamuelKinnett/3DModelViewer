@@ -190,37 +190,3 @@ void Matrix4x4::SetViewMatrix(const Vector4D& camera_position, const Vector4D& v
 	m_element[3][2] = camera_position[2];
 
 }
-
-//Fuck that awful method, use this one instead!
-void Matrix4x4::SetLookAt(Vector4D eyePosition, Vector4D target, Vector4D up) {
-	
-	SetIdentity();
-
-	Vector4D forwardVector = eyePosition - target;
-	forwardVector.Normalise();
-	Vector4D rightVector = forwardVector.CrossProduct(up);
-	rightVector.Normalise();
-	Vector4D upVector = rightVector.CrossProduct(forwardVector);
-	upVector.Normalise();
-
-	//Set the matrix
-	m_element[0][0] = rightVector[0];
-	m_element[1][0] = rightVector[1];
-	m_element[2][0] = rightVector[2];
-
-	m_element[0][1] = upVector[0];
-	m_element[1][1] = upVector[1];
-	m_element[2][1] = upVector[2];
-
-	m_element[0][2] = forwardVector[0];
-	m_element[1][2] = forwardVector[1];
-	m_element[2][2] = forwardVector[2];
-
-	//Set the position of the camera, accounting for the fact that it must be inverted
-
-	m_element[3][0] = rightVector.DotProduct(eyePosition) * -1;
-	m_element[3][1] = upVector.DotProduct(eyePosition) * -1;
-	m_element[3][2] = forwardVector.DotProduct(eyePosition) * -1;
-
-
-}

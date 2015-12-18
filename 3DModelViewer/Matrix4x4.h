@@ -28,6 +28,5 @@ public:
 	void				SetTranslate(const Vector4D& tvec);
 	void				SetScale(float sx, float sy, float sz);
 	void				SetViewMatrix(const Vector4D& camera_position, const Vector4D& view_vector, const Vector4D& up_vector);
-	void				SetLookAt(Vector4D eyePosition, Vector4D target, Vector4D upVector);
 };
 

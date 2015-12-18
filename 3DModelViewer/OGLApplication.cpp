@@ -142,6 +142,14 @@ LRESULT CALLBACK OGLApplication::WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPA
 			PostQuitMessage(0);
 			break;
 
+		case WM_KEYDOWN:
+			s_oglapp->GetApplicationWindow()->KeyDown(wparam);
+			break;
+
+		case WM_KEYUP:
+			s_oglapp->GetApplicationWindow()->KeyUp(wparam);
+			break;
+
 		default:
 			return DefWindowProc( hwnd, msg, wparam, lparam );
 	}

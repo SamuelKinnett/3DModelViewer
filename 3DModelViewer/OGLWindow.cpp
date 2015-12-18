@@ -6,6 +6,9 @@
 #include "Matrix4x4.h"
 #include "Vector4D.h"
 #include <cmath>
+#include <io.h>
+#include <iostream>
+#include <string>
 
 OGLWindow::OGLWindow()
 {
@@ -16,6 +19,9 @@ OGLWindow::~OGLWindow()
 {
 	//Clean up the renderable
 	delete m_cube;
+	models.clear();
+	sceneModels.clear();
+
 }
 
 OGLWindow::OGLWindow(HINSTANCE hInstance, int width, int height)
@@ -124,17 +130,19 @@ BOOL OGLWindow::InitWindow(HINSTANCE hInstance, int width, int height)
 	//Initialise the OpenGL variables
 	InitOGLState();
 
-	//Load the teapot model
-	models.push_back(new TriangleMesh());
-	models[0]->LoadMeshFromOBJFile("Models/teapot.obj");
+	//Load the model files
+	LoadModels();
 
-	//m_model->LoadMeshFromOBJFile("Models/cube.obj");
+	//Create the camera
+	m_camera = Camera(*new Vector4D(0, 0, -20),
+		*new Vector4D(0, 1, 0),
+		*new Vector4D(0, 0, 0)
+		);
 
-	//Add a funky transformation
-	transformations.push_back(new Matrix4x4());
-
-	//Add a teapot with the funky transformation to the world
-	sceneModels.push_back(new ModelInstance(models[0], transformations[0]));
+	//Add a teapot to the world
+	sceneModels.push_back(new Model(models[0], &m_camera, 0));
+	sceneModels[0]->SetPosition(0, 0, 0);
+	sceneModels[0]->SetScale(0.05, 0.05, 0.05);
 
 	return TRUE;
 }
@@ -155,23 +163,23 @@ void OGLWindow::Render()
 	Matrix4x4 transformation;
 	Matrix4x4 temporaryTransformation;	//Stores a transformation before it is concatenated
 										//with the main transformation.
-	
-	//Update camera variables
-	m_camera.cameraPosition.SetVector(0, 0, -10, 1);
-	m_camera.upVector.SetVector(0, 1, 0, 1);
-	m_camera.lookAt.SetVector(0, 0, 0, 1);
-	Vector4D tempViewVector = m_camera.lookAt - m_camera.cameraPosition;
-	m_camera.viewVector.SetVector(tempViewVector[0], tempViewVector[1], tempViewVector[2], tempViewVector[3]);
-	m_camera.viewVector.Normalise();
 
 	//Update the transformation matrices
 	UpdateTransformationMatrices();
 
 	//Update the camera position stored in each model
 	for (int currentModel = 0; currentModel < sceneModels.size(); ++currentModel) {
-		sceneModels[currentModel]->model->UpdateCameraPosition(&m_camera.cameraPosition);
-		sceneModels[currentModel]->model->Render(
-			sceneModels[currentModel]->transformation);
+		if (currentModel == focusedModel) {
+			float* rotation = sceneModels[currentModel]->GetRotation();
+			sceneModels[currentModel]->SetRotation(rotation[0] + rotateX,
+				rotation[1] + rotateY,
+				rotation[2] + rotateZ);
+			float* scale = sceneModels[currentModel]->GetScale();
+			sceneModels[currentModel]->SetScale(scale[0] + zoom,
+				scale[1] + zoom,
+				scale[2] + zoom);
+		}
+		sceneModels[currentModel]->Render();
 	}
 
 	//TODO:
@@ -256,7 +264,7 @@ void OGLWindow::InitOGLState()
 
 BOOL OGLWindow::MouseLBDown ( int x, int y )
 {
-	
+
 	return TRUE;
 }
 
@@ -270,30 +278,167 @@ BOOL OGLWindow::MouseMove ( int x, int y )
 	return TRUE;
 }
 
+BOOL OGLWindow::KeyDown(WPARAM key) {
+
+	if (!keyDown) {
+		switch (key) {
+
+		case 0x57:
+			//W key
+			rotateX = -0.5f;
+			break;
+
+		case 0x53:
+			//S key
+			rotateX = 0.5f;
+			break;
+
+		case 0x41:
+			//A key
+			rotateY = -0.5f;
+			break;
+
+		case 0x44:
+			//D key
+			rotateY = 0.5f;
+			break;
+
+		case 0x51:
+			//Q key
+			rotateZ = -0.5f;
+			break;
+
+		case 0x45:
+			//E key
+			rotateZ = 0.5f;
+			break;
+
+		case 0x52:
+			//R key
+			zoom = -0.0001f;
+			break;
+
+		case 0x46:
+			//R key
+			zoom = 0.0001f;
+			break;
+
+		case VK_SPACE:
+			//Spacebar
+			//Reset rotation
+			sceneModels[focusedModel]->SetPosition(0, 0, 0);
+			sceneModels[focusedModel]->SetRotation(0, 0, 0);
+			sceneModels[focusedModel]->SetScale(1, 1, 1);
+			break;
+
+
+		case VK_PRIOR:
+			//Page up, load the previous model in the list
+			if (sceneModels[focusedModel]->modelID > 0) {
+				--sceneModels[focusedModel]->modelID;
+				sceneModels[focusedModel]->SetModel(models[sceneModels[focusedModel]->modelID]);
+			}
+			break;
+
+		case VK_NEXT:
+			//Page down, load the next model in the list
+			if (sceneModels[focusedModel]->modelID < totalModels - 1) {
+				++sceneModels[focusedModel]->modelID;
+				sceneModels[focusedModel]->SetModel(models[sceneModels[focusedModel]->modelID]);
+			}
+			break;
+
+		}
+		lastKey = key;
+		keyDown = true;
+	}
+
+	return TRUE;
+}
+
+BOOL OGLWindow::KeyUp(WPARAM key) {
+
+	if (keyDown) {
+		switch (key) {
+
+		case 0x57:
+			//W key
+			rotateX = 0;
+			break;
+
+		case 0x53:
+			//S key
+			rotateX = 0;
+			break;
+
+		case 0x41:
+			//A key
+			rotateY = 0;
+			break;
+
+		case 0x44:
+			//D key
+			rotateY = 0;
+			break;
+
+		case 0x51:
+			//Q key
+			rotateZ = 0;
+			break;
+
+		case 0x45:
+			//E key
+			rotateZ = 0;
+			break;
+
+		case 0x52:
+			//R key
+			zoom = 0;
+			break;
+
+		case 0x46:
+			//R key
+			zoom = 0;
+			break;
+
+		case VK_SPACE:
+			break;
+
+		case VK_LEFT:
+			break;
+
+		case VK_PRIOR:
+			break;
+
+		case VK_NEXT:
+			break;
+		}
+
+		if (key == lastKey)
+			keyDown = false;
+	}
+	return TRUE;
+}
+
 //Add code here for updating transformation matrices
 void OGLWindow::UpdateTransformationMatrices() {
 	
-	//Translation 0, an animation.
-	Vector4D translationVector(0, 0, sin(time * 0.0174533));
-	Matrix4x4 temporaryTransformation;
 
-	transformations[0]->SetIdentity();
-	temporaryTransformation.SetIdentity();
+}
 
-	//Apply the view matrix first of all
-	temporaryTransformation.SetViewMatrix(m_camera.cameraPosition, 
-											m_camera.viewVector, 
-											m_camera.upVector);
-	*transformations[0] = *transformations[0] * temporaryTransformation;
+void OGLWindow::LoadModels() {
 
-	temporaryTransformation.SetTranslate(translationVector);
-	*transformations[0] = *transformations[0] * temporaryTransformation;
+	//Load the teapot model
+	models.push_back(new TriangleMesh());
+	models[0]->LoadMeshFromOBJFile("Models/teapot.obj");
 
-	temporaryTransformation.SetRotationYAxis(time / 30);
-	*transformations[0] = *transformations[0] * temporaryTransformation;
-	temporaryTransformation.SetRotationZAxis(time / 60);
-	*transformations[0] = *transformations[0] * temporaryTransformation;
+	//Load the cube
+	models.push_back(new TriangleMesh());
+	models[1]->LoadMeshFromOBJFile("Models/cube.obj");
+	
+	//Load the lego model
+	models.push_back(new TriangleMesh());
+	models[2]->LoadMeshFromOBJFile("Models/ShadowTest.obj");
 
-	temporaryTransformation.SetScale(0.05, 0.05, 0.05);
-	*transformations[0] = *transformations[0] * temporaryTransformation;
+	totalModels = 3;
 }
